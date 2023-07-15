@@ -1,17 +1,11 @@
-<script setup>
-</script>
+<script setup></script>
 
 <template>
     <header>
-        <div class="wrapper">
-        </div>
+        <div class="wrapper"></div>
     </header>
 
-    <main>
-        This is picscript
-    </main>
+    <main>This is picscript</main>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
