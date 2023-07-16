@@ -8,6 +8,10 @@ const props = defineProps({
     readOnly: {
         type: Boolean,
         default: true
+    },
+    showText: {
+        type: Boolean,
+        default: true
     }
 })
 
@@ -19,13 +23,13 @@ const inputElem = ref()
 defineExpose({
     inputElem
 })
-
 </script>
 
 <template>
     <div class="picblock">
         <div class="icons-container">
             <div
+                v-if="text.trim().length"
                 v-for="(textPart, partI) of text.trim().split('-')"
                 v-bind:key="partI"
                 class="icon"
@@ -34,6 +38,7 @@ defineExpose({
             </div>
         </div>
         <div
+            v-if="showText"
             class="texts-container"
             autofocus="!readOnly? true : null"
             :contentEditable="readOnly ? 'false' : 'true'"
