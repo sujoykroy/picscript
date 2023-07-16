@@ -21,7 +21,7 @@ function placeCaretAtEnd(el) {
 function onKeyPress(event) {
     lastKey.value = event.key
     placeCaretAtEnd(currentPicBlockElem.value.inputElem)
-    if (event.key.trim().length && event.key != 'Enter') return
+    if (event.key && event.key.trim().length && event.key != 'Enter') return
     let newText = currentText.value.trim()
     if (newText) {
         textList.value.push(newText)
@@ -34,7 +34,7 @@ function onKeyPress(event) {
     <div>
         <div class="picblock-container" @click="currentPicBlockElem.inputElem.focus()">
             <PicBlock
-                contenteditable="false"
+                :readOnly="true"
                 v-for="(text, textI) of textList"
                 v-bind="textI"
                 :text="text"
@@ -42,9 +42,8 @@ function onKeyPress(event) {
             <PicBlock
                 class="active-pickblock"
                 ref="currentPicBlockElem"
-                autofocus
                 @onKeyPress="onKeyPress"
-                contenteditable="true"
+                :readOnly="false"
                 v-model:text="currentText"
             />
         </div>
