@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 
 import PicBlock from '@/components/PicBlock.vue'
 
@@ -9,6 +9,7 @@ const lastKey = ref('')
 const currentPicBlockElem = ref()
 const fileToRead = ref()
 const showText = ref(true)
+let fileHandle
 
 function placeCaretAtEnd(el) {
     el.focus()
@@ -20,7 +21,7 @@ function placeCaretAtEnd(el) {
     sel.addRange(range)
 }
 
-function onKeyPress(event) {
+async function onKeyPress(event) {
     lastKey.value = event.key
     placeCaretAtEnd(currentPicBlockElem.value.inputElem)
     if (event.key && event.key.trim().length && event.key != 'Enter') return
@@ -29,6 +30,11 @@ function onKeyPress(event) {
         textList.value.push(newText)
     }
     currentText.value = ''
+    const writable = await fileHandle.createWritable()
+    // Write the contents of the file to the stream.
+    await writable.write(textList.value.join(' '))
+    // Close the stream, which persists the contents.
+    await writable.close()
 }
 
 function loadFile() {
@@ -62,6 +68,16 @@ function download(data, filename, type) {
         }, 0)
     }
 }
+
+onMounted(async () => {
+    const opfsRoot = await navigator.storage.getDirectory()
+    fileHandle = await opfsRoot.getFileHandle('my first file', { create: true })
+    const file = await fileHandle.getFile()
+    textList.value = (await file.text())
+        .trim()
+        .split(' ')
+        .filter((word) => word.trim().length)
+})
 </script>
 
 <template>

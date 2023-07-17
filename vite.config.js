@@ -12,13 +12,5 @@ export default defineConfig({
         }
     },
     assetsInclude: ['**/*.svg'],
-    build: {
-        rollupOptions: {
-            output: {
-                entryFileNames: `[name].js`,
-                chunkFileNames: `[name].js`,
-                assetFileNames: `[name].[ext]`
-            }
-        }
-    }
+
 })
