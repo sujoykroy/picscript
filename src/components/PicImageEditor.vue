@@ -52,7 +52,7 @@ function onMouseMove(event) {
                 v-for="shape of shapes"
                 :points="shape.flatPoints"
                 fill="none"
-                stroke="black"
+                stroke="blue"
             />
         </svg>
     </div>
