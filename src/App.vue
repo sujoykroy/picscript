@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted } from 'vue'
 import PicSeqEditor from '@/components/PicSeqEditor.vue'
+import PicImageEditor from '@/components/PicImageEditor.vue'
 
 import { usePicStore } from '@/stores/pic.js'
 
@@ -17,6 +18,9 @@ onMounted(async () => {
     <main>
         <div>
             <PicSeqEditor />
+        </div>
+        <div style="height: 500px">
+            <PicImageEditor />
         </div>
     </main>
 </template>
