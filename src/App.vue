@@ -1,11 +1,10 @@
 <script setup>
-import { onMounted } from 'vue'
-import PicSeqEditor from '@/components/PicSeqEditor.vue'
-import PicImageEditor from '@/components/PicImageEditor.vue'
+import { onMounted, ref } from 'vue'
 
 import { usePicStore } from '@/stores/pic.js'
 
 const picStore = usePicStore()
+const activeTab = ref('writer')
 
 onMounted(async () => {
     const opfsRoot = await navigator.storage.getDirectory()
@@ -16,13 +15,25 @@ onMounted(async () => {
 
 <template>
     <main>
-        <div>
-            <PicSeqEditor />
+        <div style="display: flex" class="top-menu">
+            <router-link :to="{ name: 'picSeqEditor' }">Writer</router-link>
+            <router-link :to="{ name: 'picImageEditor' }">Drawer</router-link>
         </div>
-        <div style="height: 500px">
-            <PicImageEditor />
+        <div>
+            <router-view></router-view>
         </div>
     </main>
 </template>
 
-<style scoped></style>
+<style scoped>
+.top-menu a {
+    padding-left: 1em;
+    padding-right: 1em;
+    border: 1px solid var(--color-border);
+}
+
+.top-menu .router-link-active {
+    color: var(--vt-c-link-text-hover);
+    background-color: var(--vt-c-link-bg-hover);
+}
+</style>

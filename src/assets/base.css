@@ -17,8 +17,8 @@
 
     --vt-c-text-light-1: var(--vt-c-indigo);
     --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
-    --vt-c-text-dark-1: var(--vt-c-white);
-    --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
+    --vt-c-text-dark-1: var(--vt-c-black-soft);
+    --vt-c-text-dark-2: var(--vt-c-black);
 }
 
 /* semantic color variables for this project */
@@ -27,13 +27,17 @@
     --color-background-soft: var(--vt-c-white-soft);
     --color-background-mute: var(--vt-c-white-mute);
 
-    --color-border: var(--vt-c-divider-light-2);
+    --color-border: var(--vt-c-divider-dark-2);
     --color-border-hover: var(--vt-c-divider-light-1);
 
-    --color-heading: var(--vt-c-text-light-1);
-    --color-text: var(--vt-c-text-light-1);
+    --color-heading: var(--vt-c-text-dark-1);
+    --color-text: var(--vt-c-text-dark-1);
 
     --section-gap: 160px;
+
+    --vt-c-link-bg-hover: var(--vt-c-indigo);
+    --vt-c-link-text-hover: var(--vt-c-white);
+    --vt-c-link-text: var(--vt-c-black);
 }
 
 /*

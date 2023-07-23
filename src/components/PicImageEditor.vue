@@ -1,7 +1,10 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
+
 const mousePressed = ref(false)
 const svgContainer = ref()
+const toolboxContainer = ref()
+const toolboxRect = ref()
 
 class Shape {
     constructor() {
@@ -55,29 +58,51 @@ function onMouseMove(event) {
     if (!mousePressed.value) return
     shapes.value.at(-1).addPointFromEvent(event, svgContainer.value)
 }
+
+function adjustSvgContainer() {
+    toolboxRect.value = toolboxContainer.value.getBoundingClientRect()
+    let remainingHeight = window.innerHeight - parseFloat(toolboxRect.value.bottom)
+    let heightWidth = Math.min(parseFloat(toolboxRect.value.width), remainingHeight)
+    svgContainer.value.style.width = heightWidth
+    svgContainer.value.style.height = heightWidth
+
+    svgContainer.value.style.left = (window.innerWidth - heightWidth) / 2
+    svgContainer.value.style.top = toolboxRect.value.bottom + (remainingHeight - heightWidth) / 4
+}
+
+onMounted(() => {
+    window.addEventListener('resize', adjustSvgContainer)
+    adjustSvgContainer()
+})
+
+onUnmounted(() => {
+    window.removeEventListener('resize', adjustSvgContainer)
+})
 </script>
 
 <template>
     <div>
-        <div style="width: 2em; height: 2em">
-            <svg
-                version="1.1"
-                width="100%"
-                height="100%"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 100 100"
-                preserveAspectRatio="none"
-            >
-                <polyline
-                    v-for="shape of shapes"
-                    :points="shape.flatPoints"
-                    fill="none"
-                    stroke="blue"
-                    stroke-width="5"
-                />
-            </svg>
+        <div ref="toolboxContainer">
+            <div style="width: 2em; height: 2em">
+                <svg
+                    version="1.1"
+                    width="100%"
+                    height="100%"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 100 100"
+                    preserveAspectRatio="none"
+                >
+                    <polyline
+                        v-for="shape of shapes"
+                        :points="shape.flatPoints"
+                        fill="none"
+                        stroke="blue"
+                        stroke-width="5"
+                    />
+                </svg>
+            </div>
+            <button @click="shapes = []">Clear</button>
         </div>
-        <button @click="shapes = []">Clear</button>
         <div
             @mousedown="onMouseDown"
             @mouseup="onMouseUp"
@@ -85,7 +110,6 @@ function onMouseMove(event) {
             @touchend="onMouseUp"
             @mousemove="onMouseMove"
             @touchmove="onMouseMove"
-            style="border: 1px solid gray; height: 100%; width: 100%"
         >
             <svg
                 version="1.1"
@@ -95,6 +119,7 @@ function onMouseMove(event) {
                 viewBox="0 0 100 100"
                 preserveAspectRatio="none"
                 ref="svgContainer"
+                style="border: 1px solid gray; position: absolute; bottom: 0px"
             >
                 <polyline
                     v-for="shape of shapes"
