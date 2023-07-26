@@ -1,46 +1,19 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
+import { OpfsDb } from '@/models/opfs_db.js'
+import { PicImage } from '@/models/pic_image.js'
+
+const DEFAULT_PIC_IMAGE_NAME = '__scratch__'
 
 const mousePressed = ref(false)
 const svgContainer = ref()
 const toolboxContainer = ref()
 const toolboxRect = ref()
 
-class Shape {
-    constructor() {
-        this.points = []
-    }
+const picImageName = ref('')
 
-    addPoint(x, y) {
-        if (x == null || y == null) return
-        this.points.push({ x: x, y: y })
-    }
-
-    addPointFromEvent(event, targetElem) {
-        let x, y
-        if (event.touches && event.touches.length) {
-            x = event.touches[0].clientX
-            y = event.touches[0].clientY
-        } else {
-            x = event.clientX
-            y = event.clientY
-        }
-        let targetRect = targetElem.getBoundingClientRect()
-        x -= targetRect.left
-        y -= targetRect.top
-        this.addPoint((100 * x) / targetRect.width, (100 * y) / targetRect.height)
-    }
-
-    get flatPoints() {
-        let points = []
-        for (let point of this.points) {
-            points.push(`${point.x}, ${point.y}`)
-        }
-        return points.join(' ')
-    }
-}
-
-const shapes = ref([])
+const picImageDb = new OpfsDb('picImage')
+const picImage = ref(new PicImage({ name: DEFAULT_PIC_IMAGE_NAME, shapes: [] }))
 
 function onMouseUp(event) {
     document.body.style.overflow = ''
@@ -49,17 +22,22 @@ function onMouseUp(event) {
 
 function onMouseDown(event) {
     document.body.style.overflow = 'hidden'
-    shapes.value.push(new Shape())
-    shapes.value.at(-1).addPointFromEvent(event, svgContainer.value)
+    picImage.value.addNewShape()
+    picImage.value.shapes.at(-1).addPointFromEvent(event, svgContainer.value)
     mousePressed.value = true
 }
 
 function onMouseMove(event) {
     if (!mousePressed.value) return
-    shapes.value.at(-1).addPointFromEvent(event, svgContainer.value)
+    picImage.value.shapes.at(-1).addPointFromEvent(event, svgContainer.value)
+}
+
+function createBlankPicImage() {
+    picImage.value = new PicImage({ name: DEFAULT_PIC_IMAGE_NAME, shapes: [] })
 }
 
 function adjustSvgContainer() {
+    if (!toolboxContainer.value) return
     toolboxRect.value = toolboxContainer.value.getBoundingClientRect()
     let remainingHeight = window.innerHeight - parseFloat(toolboxRect.value.bottom)
     let heightWidth = Math.min(parseFloat(toolboxRect.value.width), remainingHeight)
@@ -70,12 +48,50 @@ function adjustSvgContainer() {
     svgContainer.value.style.top = toolboxRect.value.bottom + (remainingHeight - heightWidth) / 4
 }
 
-onMounted(() => {
-    window.addEventListener('resize', adjustSvgContainer)
+watch(
+    () => picImage.value,
+    () => {
+        picImageName.value = picImage.value.name
+    }
+)
+
+async function savePicImage() {
+    if (!picImageName.value.trim()) return
+
+    if (picImageName.value != picImage.value.name) {
+        let existedPicImage = await picImageDb.getContent(picImageName.value, PicImage)
+        if (existedPicImage) {
+            let text =
+                'There is already an item with name ' + picImageName.value + '! Aborting save.'
+            alert(text)
+            return
+        }
+    }
+    picImage.value.name = picImageName.value
+    await picImageDb.saveContent(picImage.value.name, picImage.value)
+    alert('Item is saved')
+}
+
+async function loadPicImage() {
+    if (!picImageName.value.trim()) return
+    let existedPicImage = await picImageDb.getContent(picImageName.value, PicImage)
+    if (existedPicImage) {
+        picImage.value = existedPicImage
+    }
+}
+
+onMounted(async () => {
+    await picImageDb.init()
+    let existedPicImage = await picImageDb.getContent(picImage.value.name, PicImage)
+    if (existedPicImage) {
+        picImage.value = existedPicImage
+    }
     adjustSvgContainer()
+    window.addEventListener('resize', adjustSvgContainer)
 })
 
-onUnmounted(() => {
+onUnmounted(async () => {
+    await picImageDb.saveContent(picImage.value.name, picImage.value)
     window.removeEventListener('resize', adjustSvgContainer)
 })
 </script>
@@ -83,6 +99,15 @@ onUnmounted(() => {
 <template>
     <div>
         <div ref="toolboxContainer">
+            <div class="tool">
+                <label>
+                    Name:
+                    <input type="text" v-model="picImageName" />
+                </label>
+                <button @click="savePicImage">Save</button>
+                <button @click="loadPicImage" v-if="picImageName != picImage.name">Load</button>
+                <button @click="createBlankPicImage">Clear</button>
+            </div>
             <div style="width: 2em; height: 2em">
                 <svg
                     version="1.1"
@@ -93,7 +118,7 @@ onUnmounted(() => {
                     preserveAspectRatio="none"
                 >
                     <polyline
-                        v-for="shape of shapes"
+                        v-for="shape of picImage.shapes"
                         :points="shape.flatPoints"
                         fill="none"
                         stroke="blue"
@@ -101,7 +126,6 @@ onUnmounted(() => {
                     />
                 </svg>
             </div>
-            <button @click="shapes = []">Clear</button>
         </div>
         <div
             @mousedown="onMouseDown"
@@ -122,7 +146,7 @@ onUnmounted(() => {
                 style="border: 1px solid gray; position: absolute; bottom: 0px"
             >
                 <polyline
-                    v-for="shape of shapes"
+                    v-for="shape of picImage.shapes"
                     :points="shape.flatPoints"
                     fill="none"
                     stroke="blue"

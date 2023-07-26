@@ -30,6 +30,7 @@ onMounted(async () => {
     padding-left: 1em;
     padding-right: 1em;
     border: 1px solid var(--color-border);
+    flex-grow: 1;
 }
 
 .top-menu .router-link-active {
