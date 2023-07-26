@@ -8,8 +8,7 @@ const activeTab = ref('writer')
 
 onMounted(async () => {
     const opfsRoot = await navigator.storage.getDirectory()
-    const fileHandle = await opfsRoot.getFileHandle('my first file', { create: true })
-    //await picStore.loadPicPathList();
+    await picStore.init()
 })
 </script>
 

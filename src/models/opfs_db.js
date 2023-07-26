@@ -12,6 +12,7 @@ export class OpfsDb {
         try {
             fileHandle = await this._opfsRoot.getFileHandle(key)
         } catch (e) {
+            console.log(e)
             return null
         }
         const file = await fileHandle.getFile()

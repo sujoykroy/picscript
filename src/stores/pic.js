@@ -1,12 +1,21 @@
 import { defineStore } from 'pinia'
+import { OpfsDb } from '@/models/opfs_db.js'
+import { PicImage } from '@/models/pic_image.js'
 
 export const usePicStore = defineStore('pic', () => {
-    async function loadPicPathList() {
-        let resp = await fetch(import.meta.env.VITE_PIC_PATHLIST_URL)
-        console.log(resp.data)
+    const picImageDb = new OpfsDb('picImage')
+
+    async function init() {
+        await picImageDb.init()
+    }
+
+    async function loadPicImage(name) {
+        let picImage = await picImageDb.getContent(name, PicImage)
+        return picImage
     }
 
     return {
-        loadPicPathList
+        init,
+        loadPicImage
     }
 })

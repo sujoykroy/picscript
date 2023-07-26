@@ -1,5 +1,6 @@
 <script setup>
-import { ref } from 'vue'
+import { ref } from 'vue';
+import PicImageBlock from '@/components/PicImageBlock.vue';
 
 const props = defineProps({
     text: {
@@ -13,12 +14,12 @@ const props = defineProps({
         type: Boolean,
         default: true
     }
-})
+});
 
-const emit = defineEmits(['update:text'])
-const rootPath = import.meta.env.VITE_IMAGE_ROOT
+const emit = defineEmits(['update:text']);
+const rootPath = import.meta.env.VITE_IMAGE_ROOT;
 
-const inputElem = ref()
+const inputElem = ref();
 
 defineExpose({
     inputElem
@@ -34,7 +35,7 @@ defineExpose({
                 v-bind:key="partI"
                 class="icon"
             >
-                <img :src="rootPath + textPart + '.svg'" :alt="textPart" />
+                <PicImageBlock :text="textPart" />
             </div>
         </div>
         <div

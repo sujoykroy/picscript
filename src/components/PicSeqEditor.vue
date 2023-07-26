@@ -115,6 +115,7 @@ onMounted(async () => {
         <button @click="download(textList.join(' '), 'picscript.txt', 'text/plain')">
             Download
         </button>
+        <button @click="textList = []">Clear</button>
     </div>
 </template>
 
@@ -136,5 +137,9 @@ onMounted(async () => {
 
 .active-pickblock {
     margin-left: 1em;
+}
+
+.picblock-container .picblock .picimageblock {
+    border: 1px solid lightgray;
 }
 </style>
