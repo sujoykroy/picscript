@@ -78,6 +78,8 @@ async function loadPicImage() {
     let existedPicImage = await picImageDb.getContent(picImageName.value, PicImage)
     if (existedPicImage) {
         picImage.value = existedPicImage
+    } else {
+        picImage.value = new PicImage({ name: picImageName.value, shapes: [] })
     }
 }
 
