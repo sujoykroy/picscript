@@ -10,10 +10,10 @@ const svgContainer = ref()
 const toolboxContainer = ref()
 const toolboxRect = ref()
 
-const picImageName = ref('')
+const picImageName = ref(DEFAULT_PIC_IMAGE_NAME)
 
 const picImageDb = new OpfsDb('picImage')
-const picImage = ref(new PicImage({ name: DEFAULT_PIC_IMAGE_NAME, shapes: [] }))
+const picImage = ref()
 
 function onMouseUp(event) {
     document.body.style.overflow = ''
@@ -21,6 +21,7 @@ function onMouseUp(event) {
 }
 
 function onMouseDown(event) {
+    if (!picImage.value) return
     document.body.style.overflow = 'hidden'
     picImage.value.addNewShape()
     picImage.value.shapes.at(-1).addPointFromEvent(event, svgContainer.value)
@@ -37,7 +38,7 @@ function createBlankPicImage() {
 }
 
 function adjustSvgContainer() {
-    if (!toolboxContainer.value) return
+    if (!toolboxContainer.value || !svgContainer.value) return
     toolboxRect.value = toolboxContainer.value.getBoundingClientRect()
     let remainingHeight = window.innerHeight - parseFloat(toolboxRect.value.bottom)
     let heightWidth = Math.min(parseFloat(toolboxRect.value.width), remainingHeight)
@@ -82,10 +83,6 @@ async function loadPicImage() {
 
 onMounted(async () => {
     await picImageDb.init()
-    let existedPicImage = await picImageDb.getContent(picImage.value.name, PicImage)
-    if (existedPicImage) {
-        picImage.value = existedPicImage
-    }
     adjustSvgContainer()
     window.addEventListener('resize', adjustSvgContainer)
 })
@@ -104,12 +101,15 @@ onUnmounted(async () => {
                     Name:
                     <input type="text" v-model="picImageName" />
                 </label>
-                <button @click="savePicImage">Save</button>
-                <button @click="loadPicImage" v-if="picImageName != picImage.name">Load</button>
+                <button @click="savePicImage" v-if="picImage">Save</button>
+                <button @click="loadPicImage" v-if="!picImage || picImageName != picImage.name">
+                    Load
+                </button>
                 <button @click="createBlankPicImage">Clear</button>
             </div>
             <div style="width: 2em; height: 2em">
                 <svg
+                    v-if="picImage"
                     version="1.1"
                     width="100%"
                     height="100%"
@@ -146,6 +146,7 @@ onUnmounted(async () => {
                 style="border: 1px solid gray; position: absolute; bottom: 0px"
             >
                 <polyline
+                    v-if="picImage"
                     v-for="shape of picImage.shapes"
                     :points="shape.flatPoints"
                     fill="none"
