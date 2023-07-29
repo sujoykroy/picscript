@@ -1,15 +1,15 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue';
 
-import { usePicStore } from '@/stores/pic.js'
+import { usePicStore } from '@/stores/pic.js';
 
-const picStore = usePicStore()
-const activeTab = ref('writer')
+const picStore = usePicStore();
+const activeTab = ref('writer');
 
 onMounted(async () => {
-    const opfsRoot = await navigator.storage.getDirectory()
-    await picStore.init()
-})
+    const opfsRoot = await navigator.storage.getDirectory();
+    await picStore.init();
+});
 </script>
 
 <template>

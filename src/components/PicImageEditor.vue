@@ -1,98 +1,99 @@
 <script setup>
-import { ref, watch, onMounted, onUnmounted } from 'vue'
-import { OpfsDb } from '@/models/opfs_db.js'
-import { PicImage } from '@/models/pic_image.js'
+import { ref, watch, onMounted, onUnmounted } from 'vue';
+import { OpfsDb } from '@/models/opfs_db.js';
+import { PicImage } from '@/models/pic_image.js';
+import PicBlock from '@/components/PicBlock.vue';
 
-const DEFAULT_PIC_IMAGE_NAME = '__scratch__'
+const DEFAULT_PIC_IMAGE_NAME = '__scratch__';
 
-const mousePressed = ref(false)
-const svgContainer = ref()
-const toolboxContainer = ref()
-const toolboxRect = ref()
+const mousePressed = ref(false);
+const svgContainer = ref();
+const toolboxContainer = ref();
+const toolboxRect = ref();
 
-const picImageName = ref(DEFAULT_PIC_IMAGE_NAME)
+const picImageName = ref(DEFAULT_PIC_IMAGE_NAME);
 
-const picImageDb = new OpfsDb('picImage')
-const picImage = ref()
+const picImageDb = new OpfsDb('picImage');
+const picImage = ref(new PicImage({ name: '', shapes: [], constiWords: '' }));
 
 function onMouseUp(event) {
-    document.body.style.overflow = ''
-    mousePressed.value = false
+    document.body.style.overflow = '';
+    mousePressed.value = false;
 }
 
 function onMouseDown(event) {
-    if (!picImage.value) return
-    document.body.style.overflow = 'hidden'
-    picImage.value.addNewShape()
-    picImage.value.shapes.at(-1).addPointFromEvent(event, svgContainer.value)
-    mousePressed.value = true
+    if (!picImage.value) return;
+    document.body.style.overflow = 'hidden';
+    picImage.value.addNewShape();
+    picImage.value.shapes.at(-1).addPointFromEvent(event, svgContainer.value);
+    mousePressed.value = true;
 }
 
 function onMouseMove(event) {
-    if (!mousePressed.value) return
-    picImage.value.shapes.at(-1).addPointFromEvent(event, svgContainer.value)
+    if (!mousePressed.value) return;
+    picImage.value.shapes.at(-1).addPointFromEvent(event, svgContainer.value);
 }
 
 function createBlankPicImage() {
-    picImage.value = new PicImage({ name: DEFAULT_PIC_IMAGE_NAME, shapes: [] })
+    picImage.value = new PicImage({ name: DEFAULT_PIC_IMAGE_NAME, shapes: [] });
 }
 
 function adjustSvgContainer() {
-    if (!toolboxContainer.value || !svgContainer.value) return
-    toolboxRect.value = toolboxContainer.value.getBoundingClientRect()
-    let remainingHeight = window.innerHeight - parseFloat(toolboxRect.value.bottom)
-    let heightWidth = Math.min(parseFloat(toolboxRect.value.width), remainingHeight)
-    svgContainer.value.style.width = heightWidth
-    svgContainer.value.style.height = heightWidth
+    if (!toolboxContainer.value || !svgContainer.value) return;
+    toolboxRect.value = toolboxContainer.value.getBoundingClientRect();
+    let remainingHeight = window.innerHeight - parseFloat(toolboxRect.value.bottom);
+    let heightWidth = Math.min(parseFloat(toolboxRect.value.width), remainingHeight);
+    svgContainer.value.style.width = heightWidth;
+    svgContainer.value.style.height = heightWidth;
 
-    svgContainer.value.style.left = (window.innerWidth - heightWidth) / 2
-    svgContainer.value.style.top = toolboxRect.value.bottom + (remainingHeight - heightWidth) / 4
+    svgContainer.value.style.left = (window.innerWidth - heightWidth) / 2;
+    svgContainer.value.style.top = toolboxRect.value.bottom + (remainingHeight - heightWidth) / 4;
 }
 
 watch(
     () => picImage.value,
     () => {
-        picImageName.value = picImage.value.name
+        picImageName.value = picImage.value.name;
     }
-)
+);
 
 async function savePicImage() {
-    if (!picImageName.value.trim()) return
+    if (!picImageName.value.trim()) return;
 
     if (picImageName.value != picImage.value.name) {
-        let existedPicImage = await picImageDb.getContent(picImageName.value, PicImage)
+        let existedPicImage = await picImageDb.getContent(picImageName.value, PicImage);
         if (existedPicImage) {
             let text =
-                'There is already an item with name ' + picImageName.value + '! Aborting save.'
-            alert(text)
-            return
+                'There is already an item with name ' + picImageName.value + '! Aborting save.';
+            alert(text);
+            return;
         }
     }
-    picImage.value.name = picImageName.value
-    await picImageDb.saveContent(picImage.value.name, picImage.value)
-    alert('Item is saved')
+    picImage.value.name = picImageName.value;
+    await picImageDb.saveContent(picImage.value.name, picImage.value);
+    alert('Item is saved');
 }
 
 async function loadPicImage() {
-    if (!picImageName.value.trim()) return
-    let existedPicImage = await picImageDb.getContent(picImageName.value, PicImage)
+    if (!picImageName.value.trim()) return;
+    let existedPicImage = await picImageDb.getContent(picImageName.value, PicImage);
     if (existedPicImage) {
-        picImage.value = existedPicImage
+        picImage.value = existedPicImage;
     } else {
-        picImage.value = new PicImage({ name: picImageName.value, shapes: [] })
+        picImage.value = new PicImage({ name: picImageName.value, shapes: [] });
     }
 }
 
 onMounted(async () => {
-    await picImageDb.init()
-    adjustSvgContainer()
-    window.addEventListener('resize', adjustSvgContainer)
-})
+    await picImageDb.init();
+    adjustSvgContainer();
+    window.addEventListener('resize', adjustSvgContainer);
+});
 
 onUnmounted(async () => {
-    await picImageDb.saveContent(picImage.value.name, picImage.value)
-    window.removeEventListener('resize', adjustSvgContainer)
-})
+    // await picImageDb.saveContent(picImage.value.name, picImage.value)
+    window.removeEventListener('resize', adjustSvgContainer);
+});
 </script>
 
 <template>
@@ -103,15 +104,21 @@ onUnmounted(async () => {
                     Name:
                     <input type="text" v-model="picImageName" />
                 </label>
-                <button @click="savePicImage" v-if="picImage">Save</button>
-                <button @click="loadPicImage" v-if="!picImage || picImageName != picImage.name">
+                <button @click="savePicImage" v-if="picImage.name">Save</button>
+                <button
+                    @click="loadPicImage"
+                    v-if="!picImage.name || picImageName != picImage.name"
+                >
                     Load
+                </button>
+                <button @click="loadPicImage" v-if="picImage.name && picImageName == picImage.name">
+                    Reload
                 </button>
                 <button @click="createBlankPicImage">Clear</button>
             </div>
             <div style="width: 2em; height: 2em">
                 <svg
-                    v-if="picImage"
+                    v-if="picImage.name"
                     version="1.1"
                     width="100%"
                     height="100%"
@@ -128,6 +135,16 @@ onUnmounted(async () => {
                     />
                 </svg>
             </div>
+            <div
+                :style="{ visibility: picImage.name ? '' : 'hidden' }"
+                style="display: flex; align-items: center"
+            >
+                <label>
+                    Constituent Words:
+                    <input type="text" v-model="picImage.constiWords" />
+                </label>
+                <PicBlock :readOnly="true" :text="picImage.constiWords" :showText="false" />
+            </div>
         </div>
         <div
             @mousedown="onMouseDown"
@@ -136,6 +153,7 @@ onUnmounted(async () => {
             @touchend="onMouseUp"
             @mousemove="onMouseMove"
             @touchmove="onMouseMove"
+            :style="{ visibility: picImage.name ? '' : 'hidden' }"
         >
             <svg
                 version="1.1"
@@ -148,7 +166,7 @@ onUnmounted(async () => {
                 style="border: 1px solid gray; position: absolute; bottom: 0px"
             >
                 <polyline
-                    v-if="picImage"
+                    v-if="picImage.name"
                     v-for="shape of picImage.shapes"
                     :points="shape.flatPoints"
                     fill="none"

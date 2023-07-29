@@ -23,7 +23,7 @@ const inputElem = ref();
 
 defineExpose({
     inputElem
-})
+});
 </script>
 
 <template>
@@ -70,15 +70,17 @@ defineExpose({
 }
 
 .picblock .icons-container .icon {
-    width: 2em;
     height: 100%;
-    display: inline;
     margin: 0px;
     padding: 0px;
+    display: flex;
 }
 
 .picblock .icons-container .icon img {
-    width: 100%;
-    height: 100%;
+}
+
+.picblock .icons-container .icon .picimageblock {
+    width: 1em;
+    height: 1em;
 }
 </style>
