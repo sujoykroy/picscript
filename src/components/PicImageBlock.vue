@@ -12,7 +12,16 @@ const picStore = usePicStore();
 const picImages = ref([]);
 
 async function loadPicImages() {
+    if (!props.text) {
+        picImages.value = [];
+        return;
+    }
+
     let picImage = await picStore.loadPicImage(props.text);
+    if (!picImage) {
+        picImages.value = [];
+        return;
+    }
     if (picImage.constiWords) {
         let constiPics = [];
         for (let word of picImage.constiWords.split('-')) {

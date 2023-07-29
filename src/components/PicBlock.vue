@@ -38,23 +38,27 @@ defineExpose({
                 <PicImageBlock :text="textPart" />
             </div>
         </div>
-        <div
-            v-if="showText"
-            class="texts-container"
-            autofocus="!readOnly? true : null"
-            :contentEditable="readOnly ? 'false' : 'true'"
-            ref="inputElem"
-            @keypress="(event) => $emit('onKeyPress', event)"
-            @input="$emit('update:text', $event.target.innerText)"
-        >
+        <div v-if="showText && readOnly" @click="readOnly = false">
             {{ text }}
         </div>
+        <input
+            v-if="showText && !readOnly"
+            class="text-input"
+            autofocus="true"
+            ref="inputElem"
+            @keydown="(event) => $emit('onKeyDown', event)"
+            @input="$emit('update:text', $event.target.value)"
+            :value="text"
+            style="display: block; border: none"
+            :style="{ width: (text ? text.length * 1.1 : 2) + 'em' }"
+        />
     </div>
 </template>
 
 <style scoped>
 .picblock {
     display: inline;
+    text-align: center;
 }
 
 .picblock [contenteditable] {
@@ -66,7 +70,14 @@ defineExpose({
     height: 2em;
 }
 
-.picblock .texts-container {
+.picblock .text-input {
+    display: inline;
+    border: 0px;
+    background: transparent;
+}
+
+.picblock .text-input:focus {
+    outline: none;
 }
 
 .picblock .icons-container .icon {

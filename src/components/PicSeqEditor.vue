@@ -21,11 +21,17 @@ function placeCaretAtEnd(el) {
     sel.addRange(range);
 }
 
-async function onKeyPress(event) {
+async function onKeyDown(event) {
     lastKey.value = event.key;
-    placeCaretAtEnd(currentPicBlockElem.value.inputElem);
-    if (event.key && event.key.trim().length && event.key != 'Enter') return;
+    //placeCaretAtEnd(currentPicBlockElem.value.inputElem);
+
     let newText = currentText.value.trim();
+    if (event.key == 'Backspace' && !newText) {
+        textList.value.pop();
+        return;
+    }
+    if (event.key && event.key.trim().length && event.key != 'Enter') return false;
+
     if (newText) {
         textList.value.push(newText);
     }
@@ -106,7 +112,7 @@ onMounted(async () => {
             <PicBlock
                 class="active-pickblock"
                 ref="currentPicBlockElem"
-                @onKeyPress="onKeyPress"
+                @onKeyDown="onKeyDown"
                 :readOnly="false"
                 v-model:text="currentText"
             />
