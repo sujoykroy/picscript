@@ -32,6 +32,28 @@ class PicShape {
         }
     }
 
+    rotate(angleDeg) {
+        let cpt = mathLib.getCenterPoint(this.points);
+
+        for (let point of this.points) {
+            let dx = point.x - cpt.x;
+            let dy = point.y - cpt.y;
+            let dist = Math.sqrt(dx * dx + dy * dy);
+            let angle = Math.atan2(dy, dx) + (Math.PI * angleDeg) / 180.0;
+            point.x = cpt.x + dist * Math.cos(angle);
+            point.y = cpt.y + dist * Math.sin(angle);
+        }
+    }
+
+    flip(fx, fy) {
+        let cpt = mathLib.getCenterPoint(this.points);
+
+        for (let point of this.points) {
+            point.x = cpt.x + (point.x - cpt.x) * fx;
+            point.y = cpt.y + (point.y - cpt.y) * fy;
+        }
+    }
+
     addPointFromEvent(event, targetElem) {
         let x, y;
         if (event.touches && event.touches.length) {
@@ -73,7 +95,12 @@ export class PicImage {
     addShapeType(shapeType, options) {
         let points;
         options = options || {};
-        if (shapeType == 'circle') {
+        if (shapeType == 'line') {
+            points = [
+                { x: 10, y: 10 },
+                { x: 90, y: 10 }
+            ];
+        } else if (shapeType == 'circle') {
             options.radius = options.radius || 20;
             options.steps = options.steps || 50;
             let cx = 50;
@@ -85,7 +112,7 @@ export class PicImage {
                     y: cy + options.radius * Math.sin((2 * Math.PI * i) / options.steps)
                 });
             }
-            for (let i = 0; i < options.steps / 4; i++) {
+            for (let i = 0; i < 2; i++) {
                 points.push({ x: points[i].x, y: points[i].y });
             }
         } else {
@@ -99,7 +126,9 @@ export class PicImage {
             ];
         }
         if (!points) return;
-        this.shapes.push(new PicShape({ points: points }));
+        let picShape = new PicShape({ points: points });
+        this.shapes.push(picShape);
+        return picShape;
     }
 
     deleteShape(targetShape) {

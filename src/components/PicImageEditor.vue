@@ -162,9 +162,16 @@ onUnmounted(async () => {
                         <button v-if="picShape" @click="picShape.scale(0.99, 0.99)">
                             Scale Down
                         </button>
-
-                        <button @click="picImage.addShapeType('circle')">Add Cirlce</button>
-                        <button @click="picImage.addShapeType('box')">Add Box</button>
+                        <button v-if="picShape" @click="picShape.rotate(1)">Rotate</button>
+                        <button v-if="picShape" @click="picShape.flip(1, -1)">Flip Vertical</button>
+                        <button v-if="picShape" @click="picShape.flip(-1, 1)">
+                            Flip Horizontal
+                        </button>
+                        <button @click="picShape = picImage.addShapeType('line')">Add Line</button>
+                        <button @click="picShape = picImage.addShapeType('circle')">
+                            Add Circle
+                        </button>
+                        <button @click="picShape = picImage.addShapeType('box')">Add Box</button>
                     </label>
                 </div>
             </div>

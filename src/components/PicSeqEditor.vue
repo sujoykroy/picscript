@@ -78,7 +78,6 @@ function download(data, filename, type) {
 function onPaste(event) {
     event.preventDefault();
     let paste = (event.clipboardData || window.clipboardData).getData('text');
-    console.log(paste);
     for (let word of paste.trim().split(' ')) {
         if (!word) continue;
         textList.value.push(word);
