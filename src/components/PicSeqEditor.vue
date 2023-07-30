@@ -28,12 +28,12 @@ async function onKeyDown(event) {
     let newText = currentText.value.trim();
     if (event.key == 'Backspace' && !newText) {
         textList.value.pop();
-        return;
-    }
-    if (event.key && event.key.trim().length && event.key != 'Enter') return false;
+    } else {
+        if (event.key && event.key.trim().length && event.key != 'Enter') return false;
 
-    if (newText) {
-        textList.value.push(newText);
+        if (newText) {
+            textList.value.push(newText);
+        }
     }
     currentText.value = '';
     const writable = await fileHandle.createWritable();
@@ -75,6 +75,16 @@ function download(data, filename, type) {
     }
 }
 
+function onPaste(event) {
+    event.preventDefault();
+    let paste = (event.clipboardData || window.clipboardData).getData('text');
+    console.log(paste);
+    for (let word of paste.trim().split(' ')) {
+        if (!word) continue;
+        textList.value.push(word);
+    }
+}
+
 onMounted(async () => {
     const opfsRoot = await navigator.storage.getDirectory();
     fileHandle = await opfsRoot.getFileHandle('my first file', { create: true });
@@ -101,7 +111,11 @@ onMounted(async () => {
             </label>
             <button @click="loadFile">Load</button>
         </div>
-        <div class="picblock-container" @click="currentPicBlockElem.inputElem.focus()">
+        <div
+            class="picblock-container"
+            @click="currentPicBlockElem.inputElem.focus()"
+            @paste="onPaste"
+        >
             <PicBlock
                 :readOnly="true"
                 v-for="(text, textI) of textList"
