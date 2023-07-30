@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch, onMounted, onUnmounted } from 'vue';
 import { OpfsDb } from '@/models/opfs_db.js';
-import { PicImage } from '@/models/pic_image.js';
+import { PicImage, getPointFromEvent } from '@/models/pic_image.js';
 import PicBlock from '@/components/PicBlock.vue';
 
 const DEFAULT_PIC_IMAGE_NAME = '__scratch__';
@@ -20,19 +20,34 @@ const picShape = ref();
 function onMouseUp(event) {
     document.body.style.overflow = '';
     mousePressed.value = false;
+    if (picShape.value) {
+    }
 }
 
 function onMouseDown(event) {
     if (!picImage.value) return;
     document.body.style.overflow = 'hidden';
-    picImage.value.addNewShape();
-    picImage.value.shapes.at(-1).addPointFromEvent(event, svgContainer.value);
+    if (picShape.value) {
+        picShape.value._moveLast = getPointFromEvent(event, svgContainer.value);
+    } else {
+        picImage.value.addNewShape();
+        picImage.value.shapes.at(-1).addPointFromEvent(event, svgContainer.value);
+    }
     mousePressed.value = true;
 }
 
 function onMouseMove(event) {
     if (!mousePressed.value) return;
-    picImage.value.shapes.at(-1).addPointFromEvent(event, svgContainer.value);
+    if (picShape.value) {
+        let moveNow = getPointFromEvent(event, svgContainer.value);
+        picShape.value.moveOffset(
+            moveNow.x - picShape.value._moveLast.x,
+            moveNow.y - picShape.value._moveLast.y
+        );
+        picShape.value._moveLast = moveNow;
+    } else {
+        picImage.value.shapes.at(-1).addPointFromEvent(event, svgContainer.value);
+    }
 }
 
 function createBlankPicImage() {

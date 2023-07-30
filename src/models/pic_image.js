@@ -1,5 +1,22 @@
 import * as mathLib from '@/helpers/math_lib.js';
 
+export function getPointFromEvent(event, boundingElem) {
+    let x, y;
+    if (event.touches && event.touches.length) {
+        x = event.touches[0].clientX;
+        y = event.touches[0].clientY;
+    } else {
+        x = event.clientX;
+        y = event.clientY;
+    }
+    let targetRect = boundingElem.getBoundingClientRect();
+    x -= targetRect.left;
+    y -= targetRect.top;
+    x = (100 * x) / targetRect.width;
+    y = (100 * y) / targetRect.height;
+    return { x: x, y: y };
+}
+
 class PicShape {
     constructor({ points }) {
         this.points = points || [];
@@ -55,18 +72,8 @@ class PicShape {
     }
 
     addPointFromEvent(event, targetElem) {
-        let x, y;
-        if (event.touches && event.touches.length) {
-            x = event.touches[0].clientX;
-            y = event.touches[0].clientY;
-        } else {
-            x = event.clientX;
-            y = event.clientY;
-        }
-        let targetRect = targetElem.getBoundingClientRect();
-        x -= targetRect.left;
-        y -= targetRect.top;
-        this.addPoint((100 * x) / targetRect.width, (100 * y) / targetRect.height);
+        let point = getPointFromEvent(event, targetElem);
+        this.addPoint(point.x, point.y);
     }
 
     get flatPoints() {
