@@ -24,7 +24,9 @@ class PicShape {
 
     toJSON() {
         return {
-            points: this.points.concat()
+            points: this.points.map((pt) => {
+                return { x: pt.x, y: pt.y };
+            })
         };
     }
 
@@ -97,6 +99,12 @@ export class PicImage {
 
     addNewShape() {
         this.shapes.push(new PicShape({}));
+    }
+
+    cloneShape(picShape) {
+        picShape = new PicShape(picShape.toJSON());
+        this.shapes.push(picShape);
+        return picShape;
     }
 
     addShapeType(shapeType, options) {

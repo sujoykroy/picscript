@@ -71,6 +71,15 @@ watch(
     () => {
         picImageName.value = picImage.value.name;
         picShape.value = 0;
+
+        adjustSvgContainer();
+    }
+);
+
+watch(
+    () => picShape.value,
+    () => {
+        adjustSvgContainer();
     }
 );
 
@@ -187,6 +196,7 @@ onUnmounted(async () => {
                             Add Circle
                         </button>
                         <button @click="picShape = picImage.addShapeType('box')">Add Box</button>
+                        <button @click="picShape = picImage.cloneShape(picShape)">Clone</button>
                     </label>
                 </div>
             </div>
