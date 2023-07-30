@@ -15,6 +15,7 @@ const picImageName = ref(DEFAULT_PIC_IMAGE_NAME);
 
 const picImageDb = new OpfsDb('picImage');
 const picImage = ref(new PicImage({ name: '', shapes: [], constiWords: '' }));
+const picShape = ref();
 
 function onMouseUp(event) {
     document.body.style.overflow = '';
@@ -54,6 +55,7 @@ watch(
     () => picImage.value,
     () => {
         picImageName.value = picImage.value.name;
+        picShape.value = 0;
     }
 );
 
@@ -84,6 +86,13 @@ async function loadPicImage() {
     }
 }
 
+function deletePicShape() {
+    let text = 'Are you sure to delete selected shape?';
+    if (!confirm(text)) return;
+    picImage.value.deleteShape(picShape.value);
+    picShape.value = null;
+}
+
 onMounted(async () => {
     await picImageDb.init();
     adjustSvgContainer();
@@ -99,22 +108,65 @@ onUnmounted(async () => {
 <template>
     <div>
         <div ref="toolboxContainer">
-            <div class="tool">
-                <label>
-                    Name:
-                    <input type="text" v-model="picImageName" />
-                </label>
-                <button @click="savePicImage" v-if="picImage.name">Save</button>
-                <button
-                    @click="loadPicImage"
-                    v-if="!picImage.name || picImageName != picImage.name"
-                >
-                    Load
-                </button>
-                <button @click="loadPicImage" v-if="picImage.name && picImageName == picImage.name">
-                    Reload
-                </button>
-                <button @click="createBlankPicImage">Clear</button>
+            <div class="tool" style="display: flex; flex-direction: column">
+                <div>
+                    <label>
+                        Name:
+                        <input type="text" v-model="picImageName" />
+                    </label>
+                    <button @click="savePicImage" v-if="picImage.name">Save</button>
+                    <button
+                        @click="loadPicImage"
+                        v-if="!picImage.name || picImageName != picImage.name"
+                    >
+                        Load
+                    </button>
+                    <button
+                        @click="loadPicImage"
+                        v-if="picImage.name && picImageName == picImage.name"
+                    >
+                        Reload
+                    </button>
+                    <button @click="createBlankPicImage">Clear</button>
+                </div>
+                <div>
+                    <label>
+                        Shapes:
+                        <select v-model="picShape">
+                            <option :value="null">None</option>
+                            <option
+                                v-for="(picS, shapeI) of picImage.shapes"
+                                v-bind:key="shapeI"
+                                :value="picS"
+                            >
+                                Shape {{ shapeI + 1 }}
+                            </option>
+                        </select>
+
+                        <button v-if="picShape" @click="deletePicShape">Delete Shape</button>
+                        <button v-if="picShape" @click="picShape.moveOffset(-0.3, 0)">
+                            Move Left
+                        </button>
+                        <button v-if="picShape" @click="picShape.moveOffset(0.3, 0)">
+                            Move Right
+                        </button>
+                        <button v-if="picShape" @click="picShape.moveOffset(0, -0.3)">
+                            Move Up
+                        </button>
+                        <button v-if="picShape" @click="picShape.moveOffset(0, 0.3)">
+                            Move Down
+                        </button>
+                        <button v-if="picShape" @click="picShape.scale(1.01, 1.01)">
+                            Scale Up
+                        </button>
+                        <button v-if="picShape" @click="picShape.scale(0.99, 0.99)">
+                            Scale Down
+                        </button>
+
+                        <button @click="picImage.addShapeType('circle')">Add Cirlce</button>
+                        <button @click="picImage.addShapeType('box')">Add Box</button>
+                    </label>
+                </div>
             </div>
             <div style="width: 2em; height: 2em">
                 <svg
@@ -170,7 +222,7 @@ onUnmounted(async () => {
                     v-for="shape of picImage.shapes"
                     :points="shape.flatPoints"
                     fill="none"
-                    stroke="blue"
+                    :stroke="shape == picShape ? 'red' : 'blue'"
                 />
             </svg>
         </div>
