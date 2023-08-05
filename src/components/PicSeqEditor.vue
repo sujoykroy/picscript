@@ -120,6 +120,7 @@ onMounted(async () => {
                 v-for="(text, textI) of textList"
                 v-bind:key="textI"
                 :text="text"
+                :useCache="true"
                 :showText="showText"
             />
             <PicBlock

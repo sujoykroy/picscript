@@ -13,6 +13,10 @@ const props = defineProps({
     showText: {
         type: Boolean,
         default: true
+    },
+    useCache: {
+        type: Boolean,
+        default: true
     }
 });
 
@@ -35,7 +39,7 @@ defineExpose({
                 v-bind:key="partI"
                 class="icon"
             >
-                <PicImageBlock :text="textPart" />
+                <PicImageBlock :text="textPart" :useCache="useCache" />
             </div>
         </div>
         <div v-if="showText && readOnly" @click="readOnly = false">

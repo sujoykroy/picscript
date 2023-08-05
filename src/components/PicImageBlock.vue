@@ -5,6 +5,10 @@ import { usePicStore } from '@/stores/pic.js';
 const props = defineProps({
     text: {
         type: String
+    },
+    useCache: {
+        type: Boolean,
+        default: false
     }
 });
 
@@ -17,7 +21,7 @@ async function loadPicImages() {
         return;
     }
 
-    let picImage = await picStore.loadPicImage(props.text);
+    let picImage = await picStore.loadPicImage(props.text, { cache: props.useCache });
     if (!picImage) {
         picImages.value = [];
         return;
@@ -25,7 +29,7 @@ async function loadPicImages() {
     if (picImage.constiWords) {
         let constiPics = [];
         for (let word of picImage.constiWords.split('-')) {
-            constiPics.push(await picStore.loadPicImage(word));
+            constiPics.push(await picStore.loadPicImage(word, { cache: props.useCache }));
         }
         picImages.value = constiPics;
     } else {
