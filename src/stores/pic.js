@@ -9,13 +9,23 @@ export const usePicStore = defineStore('pic', () => {
         await picImageDb.init();
     }
 
-    async function loadPicImage(name) {
-        let picImage = await picImageDb.getContent(name, PicImage);
+    const _picImageCache = {};
+
+    async function loadPicImage(name, options) {
+        let picImage = _picImageCache[name];
+        if (options && options.cache && picImage) return picImage;
+        picImage = await picImageDb.getContent(name, PicImage);
+        if (options && options.cache) _picImageCache[name] = picImage;
         return picImage;
+    }
+
+    async function getPicNames() {
+        return await picImageDb.getKeys();
     }
 
     return {
         init,
-        loadPicImage
+        loadPicImage,
+        getPicNames
     };
 });

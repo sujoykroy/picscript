@@ -38,3 +38,21 @@ main {
     flex-direction: column;
     align-items: stretch;
 }
+
+.modal {
+    position: fixed;
+    z-index: 999;
+    background-color: var(--color-background);
+    border: 3px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.modal-content {
+    height: 80%;
+    border: 3px solid var(--color-border-hover);
+    overflow: auto;
+}
+.modal-content {
+}

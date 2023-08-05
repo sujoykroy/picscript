@@ -118,7 +118,7 @@ onMounted(async () => {
             <PicBlock
                 :readOnly="true"
                 v-for="(text, textI) of textList"
-                v-bind="textI"
+                v-bind:key="textI"
                 :text="text"
                 :showText="showText"
             />

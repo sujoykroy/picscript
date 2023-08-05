@@ -5,6 +5,16 @@ export class OpfsDb {
 
     async init() {
         this._opfsRoot = await navigator.storage.getDirectory(this._dbName, { create: true });
+        await this.getKeys();
+    }
+
+    async getKeys() {
+        let keys = [];
+        for await (const [key, value] of this._opfsRoot.entries()) {
+            keys.push(key);
+        }
+        console.log(keys);
+        return keys;
     }
 
     async getContent(key, objectClass) {

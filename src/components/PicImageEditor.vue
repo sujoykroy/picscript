@@ -3,6 +3,7 @@ import { ref, watch, onMounted, onUnmounted } from 'vue';
 import { OpfsDb } from '@/models/opfs_db.js';
 import { PicImage, getPointFromEvent } from '@/models/pic_image.js';
 import PicBlock from '@/components/PicBlock.vue';
+import PicImagePicker from '@/components/PicImagePicker.vue';
 
 const DEFAULT_PIC_IMAGE_NAME = '__scratch__';
 
@@ -16,6 +17,7 @@ const picImageName = ref(DEFAULT_PIC_IMAGE_NAME);
 const picImageDb = new OpfsDb('picImage');
 const picImage = ref(new PicImage({ name: '', shapes: [], constiWords: '' }));
 const picShape = ref();
+const showImagePicker = ref(false);
 
 function onMouseUp(event) {
     document.body.style.overflow = '';
@@ -152,6 +154,24 @@ onUnmounted(async () => {
                         Reload
                     </button>
                     <button @click="createBlankPicImage">Clear</button>
+
+                    <button @click="showImagePicker = true">Pick</button>
+                    <div v-if="showImagePicker" class="modal image-picker-modal">
+                        <div class="modal-content">
+                            <PicImagePicker
+                                @picked="
+                                    (text) => {
+                                        picImageName = text;
+                                        loadPicImage();
+                                        showImagePicker = false;
+                                    }
+                                "
+                            />
+                        </div>
+                        <div>
+                            <button @click="showImagePicker = false">Close</button>
+                        </div>
+                    </div>
                 </div>
                 <div>
                     <label>
@@ -260,3 +280,12 @@ onUnmounted(async () => {
         </div>
     </div>
 </template>
+
+<style scoped>
+.image-picker-modal {
+    top: 10%;
+    bottom: 10%;
+    left: 10%;
+    right: 10%;
+}
+</style>
