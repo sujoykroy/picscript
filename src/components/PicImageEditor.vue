@@ -1,9 +1,11 @@
 <script setup>
 import { ref, watch, onMounted, onUnmounted } from 'vue';
 import { OpfsDb } from '@/models/opfs_db.js';
-import { PicImage, getPointFromEvent } from '@/models/pic_image.js';
+import { PicImage } from '@/models/pic_image.js';
+import { PicShape } from '@/models/pic_shape.js';
 import PicBlock from '@/components/PicBlock.vue';
 import PicImagePicker from '@/components/PicImagePicker.vue';
+import PicShapeBlock from '@/components/PicShapeBlock.vue';
 
 const DEFAULT_PIC_IMAGE_NAME = '__scratch__';
 
@@ -17,12 +19,15 @@ const picImageName = ref(DEFAULT_PIC_IMAGE_NAME);
 const picImageDb = new OpfsDb('picImage');
 const picImage = ref(new PicImage({ name: '', shapes: [], constiWords: '' }));
 const picShape = ref();
+const newPicShape = ref();
 const showImagePicker = ref(false);
 
 function onMouseUp(event) {
     document.body.style.overflow = '';
     mousePressed.value = false;
     if (picShape.value) {
+    } else if (newPicShape.value) {
+        newPicShape.value = null;
     }
 }
 
@@ -30,10 +35,10 @@ function onMouseDown(event) {
     if (!picImage.value) return;
     document.body.style.overflow = 'hidden';
     if (picShape.value) {
-        picShape.value._moveLast = getPointFromEvent(event, svgContainer.value);
+        picShape.value._moveLast = PicShape.getPointFromEvent(event, svgContainer.value);
     } else {
-        picImage.value.addNewShape();
-        picImage.value.shapes.at(-1).addPointFromEvent(event, svgContainer.value);
+        if (!newPicShape.value) newPicShape.value = picImage.value.addNewShape();
+        newPicShape.value.addPointFromEvent(event, svgContainer.value);
     }
     mousePressed.value = true;
 }
@@ -41,14 +46,14 @@ function onMouseDown(event) {
 function onMouseMove(event) {
     if (!mousePressed.value) return;
     if (picShape.value) {
-        let moveNow = getPointFromEvent(event, svgContainer.value);
+        let moveNow = PicShape.getPointFromEvent(event, svgContainer.value);
         picShape.value.moveOffset(
             moveNow.x - picShape.value._moveLast.x,
             moveNow.y - picShape.value._moveLast.y
         );
         picShape.value._moveLast = moveNow;
     } else {
-        picImage.value.shapes.at(-1).addPointFromEvent(event, svgContainer.value);
+        newPicShape.value.addPointFromEvent(event, svgContainer.value);
     }
 }
 
@@ -183,7 +188,7 @@ onUnmounted(async () => {
                                 v-bind:key="shapeI"
                                 :value="picS"
                             >
-                                Shape {{ shapeI + 1 }}
+                                Shape {{ shapeI + 1 }} - {{ picS.shapeType }}
                             </option>
                         </select>
 
@@ -211,11 +216,19 @@ onUnmounted(async () => {
                         <button v-if="picShape" @click="picShape.flip(-1, 1)">
                             Flip Horizontal
                         </button>
-                        <button @click="picShape = picImage.addShapeType('line')">Add Line</button>
-                        <button @click="picShape = picImage.addShapeType('circle')">
+                        <button @click="newPicShape = picImage.addNewShape({ shapeType: 'line' })">
+                            Add Line
+                        </button>
+                        <button
+                            @click="newPicShape = picImage.addNewShape({ shapeType: 'circle' })"
+                        >
                             Add Circle
                         </button>
-                        <button @click="picShape = picImage.addShapeType('box')">Add Box</button>
+                        <button
+                            @click="newPicShape = picImage.addNewShape({ shapeType: 'rectangle' })"
+                        >
+                            Add Box
+                        </button>
                         <button @click="picShape = picImage.cloneShape(picShape)">Clone</button>
                     </label>
                 </div>
@@ -269,10 +282,11 @@ onUnmounted(async () => {
                 ref="svgContainer"
                 style="border: 1px solid gray; position: absolute; bottom: 0px"
             >
-                <polyline
+                <PicShapeBlock
                     v-if="picImage.name"
-                    v-for="shape of picImage.shapes"
-                    :points="shape.flatPoints"
+                    v-for="(shape, shapeI) of picImage.shapes"
+                    :picShape="shape"
+                    v-bind:key="shapeI"
                     fill="none"
                     :stroke="shape == picShape ? 'red' : 'blue'"
                 />

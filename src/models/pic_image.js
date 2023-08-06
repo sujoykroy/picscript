@@ -1,91 +1,6 @@
-import * as mathLib from '@/helpers/math_lib.js';
-
-export function getPointFromEvent(event, boundingElem) {
-    let x, y;
-    if (event.touches && event.touches.length) {
-        x = event.touches[0].clientX;
-        y = event.touches[0].clientY;
-    } else {
-        x = event.clientX;
-        y = event.clientY;
-    }
-    let targetRect = boundingElem.getBoundingClientRect();
-    x -= targetRect.left;
-    y -= targetRect.top;
-    x = (100 * x) / targetRect.width;
-    y = (100 * y) / targetRect.height;
-    return { x: x, y: y };
-}
-
-class PicShape {
-    constructor({ points }) {
-        this.points = points || [];
-    }
-
-    toJSON() {
-        return {
-            points: this.points.map((pt) => {
-                return { x: pt.x, y: pt.y };
-            })
-        };
-    }
-
-    addPoint(x, y) {
-        if (x == null || y == null) return;
-        this.points.push({ x: x, y: y });
-    }
-
-    moveOffset(x, y) {
-        for (let point of this.points) {
-            point.x += x;
-            point.y += y;
-        }
-    }
-
-    scale(sx, sy) {
-        let cpt = mathLib.getCenterPoint(this.points);
-
-        for (let point of this.points) {
-            point.x = (point.x - cpt.x) * sx + cpt.x;
-            point.y = (point.y - cpt.y) * sy + cpt.y;
-        }
-    }
-
-    rotate(angleDeg) {
-        let cpt = mathLib.getCenterPoint(this.points);
-
-        for (let point of this.points) {
-            let dx = point.x - cpt.x;
-            let dy = point.y - cpt.y;
-            let dist = Math.sqrt(dx * dx + dy * dy);
-            let angle = Math.atan2(dy, dx) + (Math.PI * angleDeg) / 180.0;
-            point.x = cpt.x + dist * Math.cos(angle);
-            point.y = cpt.y + dist * Math.sin(angle);
-        }
-    }
-
-    flip(fx, fy) {
-        let cpt = mathLib.getCenterPoint(this.points);
-
-        for (let point of this.points) {
-            point.x = cpt.x + (point.x - cpt.x) * fx;
-            point.y = cpt.y + (point.y - cpt.y) * fy;
-        }
-    }
-
-    addPointFromEvent(event, targetElem) {
-        let point = getPointFromEvent(event, targetElem);
-        this.addPoint(point.x, point.y);
-    }
-
-    get flatPoints() {
-        let points = [];
-        for (let point of this.points) {
-            points.push(`${point.x}, ${point.y}`);
-        }
-        return points.join(' ');
-    }
-}
+import { PicShapePolyline } from './pic_shape_polyline.js';
+import { PicShapeLine } from './pic_shape_line.js';
+import { PicShapeCircle } from './pic_shape_circle.js';
 
 export class PicImage {
     constructor({ name, shapes, constiWords }) {
@@ -93,18 +8,33 @@ export class PicImage {
         this.shapes = [];
         this.constiWords = constiWords || '';
         for (let shapeData of shapes) {
-            this.shapes.push(new PicShape(shapeData));
+            this.addNewShape(shapeData);
         }
     }
 
-    addNewShape() {
-        this.shapes.push(new PicShape({}));
+    addNewShape(shapeData) {
+        if (!shapeData) {
+            shapeData = { shapeType: PicShapePolyline.shapeType };
+        }
+        console.log(shapeData.shapeType, PicShapeCircle.shapeType);
+        let shapeObj = null;
+        if (shapeData.shapeType == PicShapePolyline.shapeType) {
+            shapeObj = new PicShapePolyline(shapeData);
+        } else if (shapeData.shapeType == PicShapeLine.shapeType) {
+            shapeObj = new PicShapeLine(shapeData);
+        } else if (shapeData.shapeType == PicShapeCircle.shapeType) {
+            shapeObj = new PicShapeCircle(shapeData);
+        } else {
+            shapeObj = new PicShapePolyline(shapeData);
+        }
+        console.log(shapeObj.shapeType);
+        this.shapes.push(shapeObj);
+        return shapeObj;
     }
 
     cloneShape(picShape) {
-        picShape = new PicShape(picShape.toJSON());
-        this.shapes.push(picShape);
-        return picShape;
+        this.addNewShape(picShape.toJSON());
+        return this.shapes.at(-1);
     }
 
     addShapeType(shapeType, options) {

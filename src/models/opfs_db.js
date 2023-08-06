@@ -13,7 +13,6 @@ export class OpfsDb {
         for await (const [key, value] of this._opfsRoot.entries()) {
             keys.push(key);
         }
-        console.log(keys);
         return keys;
     }
 

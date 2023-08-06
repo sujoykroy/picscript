@@ -54,7 +54,12 @@ onMounted(async () => {
             viewBox="0 0 100 100"
             preserveAspectRatio="none"
         >
-            <PicShapeBlock v-if="picImage" v-for="shape of picImage.shapes" :picShape="shape" />
+            <PicShapeBlock
+                v-if="picImage"
+                v-for="(shape, shapeI) of picImage.shapes"
+                :picShape="shape"
+                v-bind:key="shapeI"
+            />
         </svg>
     </div>
 </template>
