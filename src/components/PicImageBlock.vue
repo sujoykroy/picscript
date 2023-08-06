@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import { usePicStore } from '@/stores/pic.js';
+import PicShapeBlock from '@/components/PicShapeBlock.vue';
 
 const props = defineProps({
     text: {
@@ -53,14 +54,7 @@ onMounted(async () => {
             viewBox="0 0 100 100"
             preserveAspectRatio="none"
         >
-            <polyline
-                v-if="picImage"
-                v-for="shape of picImage.shapes"
-                :points="shape.flatPoints"
-                fill="none"
-                stroke="blue"
-                stroke-width="5"
-            />
+            <PicShapeBlock v-if="picImage" v-for="shape of picImage.shapes" :picShape="shape" />
         </svg>
     </div>
 </template>
