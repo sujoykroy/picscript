@@ -22,14 +22,15 @@ function placeCaretAtEnd(el) {
 }
 
 async function onKeyDown(event) {
-    lastKey.value = event.key;
+    lastKey.value = event.code;
     //placeCaretAtEnd(currentPicBlockElem.value.inputElem);
 
     let newText = currentText.value.trim();
     if (event.key == 'Backspace' && !newText) {
         textList.value.pop();
     } else {
-        if (event.key && event.key.trim().length && event.key != 'Enter') return false;
+        if (event.key && event.key.trim().length && event.key != 'Enter' && event.code != 'Space')
+            return false;
 
         if (newText) {
             textList.value.push(newText);
