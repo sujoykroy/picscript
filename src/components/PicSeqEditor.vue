@@ -22,7 +22,7 @@ function placeCaretAtEnd(el) {
 }
 
 async function onKeyDown(event) {
-    lastKey.value = event.code;
+    lastKey.value = event.keyCode;
     //placeCaretAtEnd(currentPicBlockElem.value.inputElem);
 
     let newText = currentText.value.trim();
