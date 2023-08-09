@@ -1,7 +1,7 @@
 export class PicShape {
     static shapeType = 'shape';
 
-    constructor() {}
+    constructor(options) {}
 
     get shapeType() {
         return this.constructor.shapeType;

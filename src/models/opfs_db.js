@@ -4,7 +4,8 @@ export class OpfsDb {
     }
 
     async init() {
-        this._opfsRoot = await navigator.storage.getDirectory(this._dbName, { create: true });
+        let root = await navigator.storage.getDirectory();
+        this._opfsRoot = await root.getDirectoryHandle(this._dbName, { create: true });
         await this.getKeys();
     }
 
@@ -21,7 +22,6 @@ export class OpfsDb {
         try {
             fileHandle = await this._opfsRoot.getFileHandle(key);
         } catch (e) {
-            console.log(e);
             return null;
         }
         const file = await fileHandle.getFile();
@@ -31,13 +31,14 @@ export class OpfsDb {
             contentObject = new objectClass(JSON.parse(text));
         } catch (e) {
             console.log(e);
+            console.log(this._dbName, key);
+            console.log(text);
             return null;
         }
         return contentObject;
     }
 
     async saveContent(key, contentObject) {
-        console.log('saveContent', key);
         let fileHandle;
         try {
             fileHandle = await this._opfsRoot.getFileHandle(key, { create: true });

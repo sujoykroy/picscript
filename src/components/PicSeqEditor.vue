@@ -29,7 +29,6 @@ async function onKeyDown(event) {
     if (event.key == 'Backspace' && !newText) {
         textList.value.pop();
     } else {
-        console.log(event.key.trim().length);
         if (event.key && event.key.trim().length && event.key != 'Enter') return false;
 
         if (newText) {

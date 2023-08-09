@@ -5,7 +5,7 @@ export class PicShapeCircle extends PicShape {
     static shapeType = 'circle';
 
     constructor(options) {
-        super();
+        super(options);
         if (!options) options = {};
         this.cx = options.cx;
         this.cy = options.cy;
@@ -23,10 +23,19 @@ export class PicShapeCircle extends PicShape {
 
     addPoint(x, y) {
         if (this.cx == null) {
-            this.cx = this.cx;
-            this.cy = this.cy;
+            this.cx = x;
+            this.cy = y;
         } else {
             this.radius = Math.sqrt((this.cx - x) ** 2 + (this.cy - y) ** 2);
         }
+    }
+
+    moveOffset(x, y) {
+        this.cx += x;
+        this.cy += y;
+    }
+
+    scale(sx, sy) {
+        this.radius *= (sx + sy) / 2;
     }
 }

@@ -243,12 +243,10 @@ onUnmounted(async () => {
                     viewBox="0 0 100 100"
                     preserveAspectRatio="none"
                 >
-                    <polyline
-                        v-for="shape of picImage.shapes"
-                        :points="shape.flatPoints"
-                        fill="none"
-                        stroke="blue"
-                        stroke-width="5"
+                    <PicShapeBlock
+                        v-for="(shape, shapeI) of picImage.shapes"
+                        :picShape="shape"
+                        v-bind:key="shapeI"
                     />
                 </svg>
             </div>
@@ -287,7 +285,6 @@ onUnmounted(async () => {
                     v-for="(shape, shapeI) of picImage.shapes"
                     :picShape="shape"
                     v-bind:key="shapeI"
-                    fill="none"
                     :stroke="shape == picShape ? 'red' : 'blue'"
                 />
             </svg>

@@ -5,7 +5,7 @@ export class PicShapePolyline extends PicShape {
     static shapeType = 'polyline';
 
     constructor(options) {
-        super();
+        super(options);
         if (!options) options = {};
         this.points = options.points || [];
     }

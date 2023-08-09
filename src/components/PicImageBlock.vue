@@ -59,6 +59,9 @@ onMounted(async () => {
                 v-for="(shape, shapeI) of picImage.shapes"
                 :picShape="shape"
                 v-bind:key="shapeI"
+                fill="none"
+                stroke="blue"
+                stroke-width="5"
             />
         </svg>
     </div>

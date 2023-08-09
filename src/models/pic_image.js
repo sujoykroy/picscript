@@ -1,6 +1,7 @@
 import { PicShapePolyline } from './pic_shape_polyline.js';
 import { PicShapeLine } from './pic_shape_line.js';
 import { PicShapeCircle } from './pic_shape_circle.js';
+import { PicShapeRectangle } from './pic_shape_rectangle.js';
 
 export class PicImage {
     constructor({ name, shapes, constiWords }) {
@@ -16,7 +17,6 @@ export class PicImage {
         if (!shapeData) {
             shapeData = { shapeType: PicShapePolyline.shapeType };
         }
-        console.log(shapeData.shapeType, PicShapeCircle.shapeType);
         let shapeObj = null;
         if (shapeData.shapeType == PicShapePolyline.shapeType) {
             shapeObj = new PicShapePolyline(shapeData);
@@ -24,10 +24,11 @@ export class PicImage {
             shapeObj = new PicShapeLine(shapeData);
         } else if (shapeData.shapeType == PicShapeCircle.shapeType) {
             shapeObj = new PicShapeCircle(shapeData);
+        } else if (shapeData.shapeType == PicShapeRectangle.shapeType) {
+            shapeObj = new PicShapeRectangle(shapeData);
         } else {
             shapeObj = new PicShapePolyline(shapeData);
         }
-        console.log(shapeObj.shapeType);
         this.shapes.push(shapeObj);
         return shapeObj;
     }
