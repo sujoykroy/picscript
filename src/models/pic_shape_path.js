@@ -35,7 +35,9 @@ export class PicShapePath extends PicShapePolyline {
         let d = '';
         for (let c = 0; c < this.curveCount; c++) {
             let points = this.points.slice(c * 4, (c + 1) * 4);
-            d += `M${points[0].x}, ${points[0].y}`;
+            if (points.length > 0) {
+                d += `M${points[0].x}, ${points[0].y}`;
+            }
             if (points.length < 4) {
                 for (let i = 1; i < points.length; i++) {
                     d += ` L${points[i].x},${points[i].y}`;
