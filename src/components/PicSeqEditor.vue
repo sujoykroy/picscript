@@ -22,14 +22,14 @@ function placeCaretAtEnd(el) {
 }
 
 async function onKeyDown(event) {
-    lastKey.value = event.keyCode;
+    lastKey.value = event;
     //placeCaretAtEnd(currentPicBlockElem.value.inputElem);
 
     let newText = currentText.value.trim();
     if (event.key == 'Backspace' && !newText) {
         textList.value.pop();
     } else {
-        if (event.key && event.key.trim().length && event.key != 'Enter' && event.code != 'Space')
+        if (event.key && event.key != 'Enter' && event.code != 'Space')
             return false;
 
         if (newText) {
@@ -132,7 +132,7 @@ onMounted(async () => {
                 v-model:text="currentText"
             />
         </div>
-        <div>{{ lastKey.length }}/{{ lastKey }}</div>
+        <div>{{ lastKey.length }}/{{ lastKey.code }}</div>
         <button @click="download(textList.join(' '), 'picscript.txt', 'text/plain')">
             Download
         </button>
