@@ -2,6 +2,7 @@ import { PicShapePolyline } from './pic_shape_polyline.js';
 import { PicShapeLine } from './pic_shape_line.js';
 import { PicShapeCircle } from './pic_shape_circle.js';
 import { PicShapeRectangle } from './pic_shape_rectangle.js';
+import { PicShapePath } from './pic_shape_path.js';
 
 export class PicImage {
     constructor({ name, shapes, constiWords }) {
@@ -26,6 +27,8 @@ export class PicImage {
             shapeObj = new PicShapeCircle(shapeData);
         } else if (shapeData.shapeType == PicShapeRectangle.shapeType) {
             shapeObj = new PicShapeRectangle(shapeData);
+        } else if (shapeData.shapeType == PicShapePath.shapeType) {
+            shapeObj = new PicShapePath(shapeData);
         } else {
             shapeObj = new PicShapePolyline(shapeData);
         }

@@ -3,6 +3,7 @@ import { ref, watch, onMounted, onUnmounted } from 'vue';
 import { OpfsDb } from '@/models/opfs_db.js';
 import { PicImage } from '@/models/pic_image.js';
 import { PicShape } from '@/models/pic_shape.js';
+import { PicShapePath } from '@/models/pic_shape_path.js';
 import PicBlock from '@/components/PicBlock.vue';
 import PicImagePicker from '@/components/PicImagePicker.vue';
 import PicShapeBlock from '@/components/PicShapeBlock.vue';
@@ -27,14 +28,17 @@ function onMouseUp(event) {
     mousePressed.value = false;
     if (picShape.value) {
     } else if (newPicShape.value) {
-        newPicShape.value = null;
+        if (newPicShape.value.getShapeType() == PicShapePath.shapeType) {
+        } else {
+            newPicShape.value = null;
+        }
     }
 }
 
 function onMouseDown(event) {
     if (!picImage.value) return;
     document.body.style.overflow = 'hidden';
-    if (picShape.value) {
+    if (!newPicShape.value && picShape.value) {
         picShape.value._moveLast = PicShape.getPointFromEvent(event, svgContainer.value);
     } else {
         if (!newPicShape.value) newPicShape.value = picImage.value.addNewShape();
@@ -53,7 +57,10 @@ function onMouseMove(event) {
         );
         picShape.value._moveLast = moveNow;
     } else {
-        newPicShape.value.addPointFromEvent(event, svgContainer.value);
+        if (newPicShape.value.getShapeType() == PicShapePath.shapeType) {
+        } else {
+            newPicShape.value.addPointFromEvent(event, svgContainer.value);
+        }
     }
 }
 
@@ -228,6 +235,25 @@ onUnmounted(async () => {
                             @click="newPicShape = picImage.addNewShape({ shapeType: 'rectangle' })"
                         >
                             Add Box
+                        </button>
+                        <button @click="newPicShape = picImage.addNewShape({ shapeType: 'path' })">
+                            Add Path
+                        </button>
+                        <button
+                            v-if="
+                                newPicShape && newPicShape.getShapeType() == PicShapePath.shapeType
+                            "
+                            @click="newPicShape.addCurve()"
+                        >
+                            Add New Curve</button
+                        ><button
+                            v-if="newPicShape"
+                            @click="
+                                newPicShape = null;
+                                picShape = null;
+                            "
+                        >
+                            Finish Shape
                         </button>
                         <button @click="picShape = picImage.cloneShape(picShape)">Clone</button>
                     </label>

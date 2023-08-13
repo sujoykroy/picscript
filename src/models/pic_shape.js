@@ -3,6 +3,10 @@ export class PicShape {
 
     constructor(options) {}
 
+    getShapeType() {
+        return this.constructor.shapeType;
+    }
+
     get shapeType() {
         return this.constructor.shapeType;
     }

@@ -4,22 +4,28 @@ import { PicShapeLine } from './pic_shape_line.js';
 export class PicShapeRectangle extends PicShapeLine {
     static shapeType = 'rectangle';
 
-    get x() {
-        if (this.points.length < 2) return 0;
-        return Math.min(this.points[0].x, this.points[1].x);
-    }
-    get y() {
-        if (this.points.length < 2) return 0;
-        return Math.min(this.points[0].y, this.points[1].y);
-    }
+    addPoint(x, y) {
+        if (x == null || y == null) return;
+        if (this.points.length == 0) {
+            this.points.push({ x: x, y: y });
+        } else {
+            if (this.points.length == 1) {
+                this.points.push({ x: x, y: this.points[0].y });
+                this.points.push({ x: x, y: y });
+                this.points.push({ x: this.points[0].x, y: y });
+                this.points.push({ x: this.points[0].x, y: this.points[0].y });
 
-    get width() {
-        if (this.points.length < 2) return 0;
-        return Math.abs(this.points[0].x - this.points[1].x);
-    }
+                this.points.push({ x: x, y: this.points[0].y }); // extra
+            } else {
+                this.points[1].x = x;
 
-    get height() {
-        if (this.points.length < 2) return 0;
-        return Math.abs(this.points[0].y - this.points[1].y);
+                this.points[2].x = x;
+                this.points[2].y = y;
+
+                this.points[3].y = y;
+
+                this.points[5].x = x;
+            }
+        }
     }
 }

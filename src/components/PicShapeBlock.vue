@@ -3,6 +3,7 @@ import { PicShapePolyline } from '@/models/pic_shape_polyline.js';
 import { PicShapeLine } from '@/models/pic_shape_line.js';
 import { PicShapeCircle } from '@/models/pic_shape_circle.js';
 import { PicShapeRectangle } from '@/models/pic_shape_rectangle.js';
+import { PicShapePath } from '@/models/pic_shape_path.js';
 
 const props = defineProps({
     picShape: {
@@ -24,12 +25,16 @@ const props = defineProps({
 </script>
 
 <template>
-    <rect
+    <polyline
         v-if="picShape.shapeType == PicShapeRectangle.shapeType"
-        :x="picShape.x"
-        :y="picShape.y"
-        :width="picShape.width"
-        :height="picShape.height"
+        :points="picShape.flatPoints"
+        :fill="fill"
+        :stroke="stroke"
+        :stroke-width="strokeWidth"
+    />
+    <path
+        v-if="picShape.shapeType == PicShapePath.shapeType"
+        :d="picShape.flatPoints"
         :fill="fill"
         :stroke="stroke"
         :stroke-width="strokeWidth"
