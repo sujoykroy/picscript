@@ -16,7 +16,7 @@ export class PicShapePath extends PicShapePolyline {
     }
 
     addPoint(x, y) {
-        if (this.points.length < this.curveCount * 4) {
+        if (this.points.length < this.curveCount * 3 + 1) {
             super.addPoint(x, y);
         } else {
             this.points.at(-1).x = x;
@@ -25,7 +25,7 @@ export class PicShapePath extends PicShapePolyline {
     }
 
     addCurve() {
-        if (this.points.length == this.curveCount * 4) {
+        if (this.points.length == this.curveCount * 3 + 1) {
             this.curveCount += 1;
         }
     }
@@ -33,24 +33,23 @@ export class PicShapePath extends PicShapePolyline {
     get flatPoints() {
         if (!this.points.length) return '';
         let d = '';
+        d += `M${this.points[0].x}, ${this.points[0].y}`;
+
         for (let c = 0; c < this.curveCount; c++) {
-            let points = this.points.slice(c * 4, (c + 1) * 4);
-            if (points.length > 0) {
-                d += `M${points[0].x}, ${points[0].y}`;
-            }
-            if (points.length < 4) {
-                for (let i = 1; i < points.length; i++) {
+            let points = this.points.slice(c * 3 + 1, (c + 1) * 3 + 1);
+            if (points.length < 3) {
+                for (let i = 0; i < points.length; i++) {
                     d += ` L${points[i].x},${points[i].y}`;
                 }
             } else {
-                const xq1 = points[1].x;
-                const yq1 = points[1].y;
+                const xq1 = points[0].x;
+                const yq1 = points[0].y;
 
-                const xq2 = points[2].x;
-                const yq2 = points[2].y;
+                const xq2 = points[1].x;
+                const yq2 = points[1].y;
 
-                const x1 = points[3].x;
-                const y1 = points[3].y;
+                const x1 = points[2].x;
+                const y1 = points[2].y;
 
                 d += ` C${xq1},${yq1} ${xq2},${yq2} ${x1},${y1}`;
             }
