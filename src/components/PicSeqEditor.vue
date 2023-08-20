@@ -131,7 +131,7 @@ onMounted(async () => {
                 v-model:text="currentText"
             />
         </div>
-        <div>key={{ lastKey.key }}, code={{ lastKey.code }}</div>
+        <div>key={{ lastKey.key }}, code={{ lastKey.keyCode }}</div>
         <button @click="download(textList.join(' '), 'picscript.txt', 'text/plain')">
             Download
         </button>
