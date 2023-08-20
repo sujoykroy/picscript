@@ -29,8 +29,7 @@ async function onKeyDown(event) {
     if (event.key == 'Backspace' && !newText) {
         textList.value.pop();
     } else {
-        if (event.key && event.key != 'Enter' && event.code != 'Space')
-            return false;
+        if (event.key && event.key != 'Enter' && event.code != 'Space') return false;
 
         if (newText) {
             textList.value.push(newText);
@@ -132,7 +131,7 @@ onMounted(async () => {
                 v-model:text="currentText"
             />
         </div>
-        <div>{{ lastKey.length }}/{{ lastKey.code }}</div>
+        <div>key={{ lastKey.key }}, code={{ lastKey.code }}</div>
         <button @click="download(textList.join(' '), 'picscript.txt', 'text/plain')">
             Download
         </button>
