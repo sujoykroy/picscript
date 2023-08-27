@@ -50,7 +50,7 @@ defineExpose({
             class="text-input"
             autofocus="true"
             ref="inputElem"
-            @keydown="(event) => $emit('onKeyDown', event)"
+            @keyup="(event) => $emit('onKeyUp', event)"
             @input="$emit('update:text', $event.target.value)"
             :value="text"
             style="display: block; border: none"

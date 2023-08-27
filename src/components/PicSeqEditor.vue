@@ -5,7 +5,6 @@ import PicBlock from '@/components/PicBlock.vue';
 
 const textList = ref([]);
 const currentText = ref('');
-const lastKey = ref('');
 const currentPicBlockElem = ref();
 const fileToRead = ref();
 const showText = ref(true);
@@ -21,15 +20,13 @@ function placeCaretAtEnd(el) {
     sel.addRange(range);
 }
 
-async function onKeyDown(event) {
-    lastKey.value = event;
-    //placeCaretAtEnd(currentPicBlockElem.value.inputElem);
-
+async function onKeyUp(event) {
+    const hasSpace = currentText.value.includes(' ');
     let newText = currentText.value.trim();
     if (event.key == 'Backspace' && !newText) {
         textList.value.pop();
     } else {
-        if (event.key && event.key != 'Enter' && event.code != 'Space') return false;
+        if (!hasSpace && event.key && event.key != 'Enter' && event.code != 'Space') return false;
 
         if (newText) {
             textList.value.push(newText);
@@ -126,12 +123,11 @@ onMounted(async () => {
             <PicBlock
                 class="active-pickblock"
                 ref="currentPicBlockElem"
-                @onKeyDown="onKeyDown"
+                @onKeyUp="onKeyUp"
                 :readOnly="false"
                 v-model:text="currentText"
             />
         </div>
-        <div>key={{ lastKey.key }}, code={{ lastKey.keyCode }}</div>
         <button @click="download(textList.join(' '), 'picscript.txt', 'text/plain')">
             Download
         </button>
@@ -158,6 +154,7 @@ onMounted(async () => {
 
 .active-pickblock {
     margin-left: 1em;
+    /* border: 1px solid black; */
 }
 
 .picblock-container .picblock .picimageblock {
